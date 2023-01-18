@@ -136,8 +136,8 @@ resource "aws_api_gateway_model" "mockSantanderGetBillingResponseModel" {
     "chave",
     "pix"
   ]
-}
-EOF
+  }
+  EOF
 }
 
 resource "aws_api_gateway_integration" "mockSantanderGetBillingIntegration" {

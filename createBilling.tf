@@ -43,7 +43,7 @@ resource "aws_api_gateway_model" "mockSantanderCreateBillingRequestModel" {
       "chave"
     ]
   }
-EOF
+  EOF
 }
 
 resource "aws_api_gateway_model" "mockSantanderCreateBillingResponseModel" {
@@ -107,15 +107,15 @@ resource "aws_api_gateway_model" "mockSantanderCreateBillingResponseModel" {
     "valor",
     "chave"
   ]
-}
-EOF
+  }
+  EOF
 }
 
 resource "aws_api_gateway_method" "mockSantanderCreateBillingMethod" {
-  rest_api_id    = aws_api_gateway_rest_api.mockSantander.id
-  resource_id    = aws_api_gateway_resource.mockSantanderResourceTxId.id
-  http_method    = "PUT"
-  authorization  = "NONE"
+  rest_api_id   = aws_api_gateway_rest_api.mockSantander.id
+  resource_id   = aws_api_gateway_resource.mockSantanderResourceTxId.id
+  http_method   = "PUT"
+  authorization = "NONE"
   request_models = {
     "application/json" = aws_api_gateway_model.mockSantanderCreateBillingRequestModel.name
   }
@@ -161,10 +161,10 @@ resource "aws_api_gateway_integration_response" "mockSantanderCreateBillingInteg
 }
 
 resource "aws_api_gateway_integration_response" "mockSantanderCreateBillingIntegrationResponse500" {
-  rest_api_id = aws_api_gateway_rest_api.mockSantander.id
-  resource_id = aws_api_gateway_resource.mockSantanderResourceTxId.id
-  http_method = aws_api_gateway_method.mockSantanderCreateBillingMethod.http_method
-  status_code = aws_api_gateway_method_response.mockSantanderCreateBillingResponse500.status_code
+  rest_api_id       = aws_api_gateway_rest_api.mockSantander.id
+  resource_id       = aws_api_gateway_resource.mockSantanderResourceTxId.id
+  http_method       = aws_api_gateway_method.mockSantanderCreateBillingMethod.http_method
+  status_code       = aws_api_gateway_method_response.mockSantanderCreateBillingResponse500.status_code
   selection_pattern = "5\\d{2}"
 
   response_templates = {
