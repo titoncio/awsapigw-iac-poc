@@ -38,3 +38,21 @@ resource "aws_api_gateway_resource" "mockSantanderResourceToken" {
   parent_id   = aws_api_gateway_resource.mockSantanderResourceOauth.id
   path_part   = "token"
 }
+
+resource "aws_api_gateway_resource" "mockSantanderResourcePix" {
+  rest_api_id = aws_api_gateway_rest_api.mockSantander.id
+  parent_id   = aws_api_gateway_resource.mockSantanderResourceV1.id
+  path_part   = "pix"
+}
+
+resource "aws_api_gateway_resource" "mockSantanderResourceEndToEndId" {
+  rest_api_id = aws_api_gateway_rest_api.mockSantander.id
+  parent_id   = aws_api_gateway_resource.mockSantanderResourcePix.id
+  path_part   = "{endToEndId}"
+}
+
+resource "aws_api_gateway_resource" "mockSantanderResourceDevolucao" {
+  rest_api_id = aws_api_gateway_rest_api.mockSantander.id
+  parent_id   = aws_api_gateway_resource.mockSantanderResourceEndToEndId.id
+  path_part   = "devolucao"
+}
