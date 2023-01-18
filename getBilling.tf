@@ -140,6 +140,12 @@ resource "aws_api_gateway_model" "mockSantanderGetBillingResponseModel" {
   EOF
 }
 
+resource "aws_api_gateway_request_validator" "mockSantanderGetBillingRequestValidator" {
+  name                        = "GetBillingRequestValidator"
+  rest_api_id                 = aws_api_gateway_rest_api.mockSantander.id
+  validate_request_parameters = true
+}
+
 resource "aws_api_gateway_integration" "mockSantanderGetBillingIntegration" {
   rest_api_id = aws_api_gateway_rest_api.mockSantander.id
   resource_id = aws_api_gateway_resource.mockSantanderResourceTxId.id
@@ -147,12 +153,12 @@ resource "aws_api_gateway_integration" "mockSantanderGetBillingIntegration" {
   request_templates = {
     "application/json" = <<EOF
       {
-        "statusCode": 200,
-        "txid" : $util.escapeJavaScript($input.params('txid'))
+        "statusCode": 200
       }
     EOF
   }
-  type = "MOCK"
+  request_parameters = { "integration.request.path.txid" = "'method.request.path.txid'" }
+  type               = "MOCK"
 }
 
 resource "aws_api_gateway_method_response" "mockSantanderGetBillingResponse200" {
@@ -212,9 +218,30 @@ resource "aws_api_gateway_integration_response" "mockSantanderGetBillingIntegrat
   }
 }
 
+resource "aws_api_gateway_method_response" "mockSantanderGetBillingResponse500" {
+  rest_api_id = aws_api_gateway_rest_api.mockSantander.id
+  resource_id = aws_api_gateway_resource.mockSantanderResourceTxId.id
+  http_method = aws_api_gateway_method.mockSantanderGetBillingMethod.http_method
+  status_code = "500"
+  response_models = {
+    "application/json" = aws_api_gateway_model.mockSantanderGetBillingResponseModel.name
+  }
+}
+
+resource "aws_api_gateway_integration_response" "mockSantanderGetBillingIntegrationResponse500" {
+  rest_api_id       = aws_api_gateway_rest_api.mockSantander.id
+  resource_id       = aws_api_gateway_resource.mockSantanderResourceTxId.id
+  http_method       = aws_api_gateway_method.mockSantanderGetBillingMethod.http_method
+  status_code       = aws_api_gateway_method_response.mockSantanderGetBillingResponse500.status_code
+  selection_pattern = "5\\d{2}"
+}
+
+
 resource "aws_api_gateway_method" "mockSantanderGetBillingMethod" {
-  rest_api_id   = aws_api_gateway_rest_api.mockSantander.id
-  resource_id   = aws_api_gateway_resource.mockSantanderResourceTxId.id
-  http_method   = "GET"
-  authorization = "NONE"
+  rest_api_id          = aws_api_gateway_rest_api.mockSantander.id
+  resource_id          = aws_api_gateway_resource.mockSantanderResourceTxId.id
+  http_method          = "GET"
+  authorization        = "NONE"
+  request_validator_id = aws_api_gateway_request_validator.mockSantanderGetBillingRequestValidator.id
+  request_parameters   = { "method.request.path.txid" = true }
 }
