@@ -91,7 +91,7 @@ resource "aws_api_gateway_integration" "mockSantanderRefundBillingIntegration" {
       }
     EOF
   }
-  request_parameters = { "integration.request.header.refundId" = "'method.request.header.refundId'" }
+  request_parameters = { "integration.request.querystring.refundId" = "'method.request.querystring.refundId'" }
   type               = "MOCK"
 }
 
