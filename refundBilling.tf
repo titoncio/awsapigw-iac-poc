@@ -19,6 +19,13 @@ resource "aws_api_gateway_model" "mockSantanderRefundBillingRequestModel" {
   EOF
 }
 
+resource "aws_api_gateway_request_validator" "mockSantanderRefundBillingRequestValidator" {
+  name                        = "RefundBillingRequestValidator"
+  rest_api_id                 = aws_api_gateway_rest_api.mockSantander.id
+  validate_request_body       = true
+  validate_request_parameters = true
+}
+
 resource "aws_api_gateway_model" "mockSantanderRefundBillingResponseModel" {
   rest_api_id  = aws_api_gateway_rest_api.mockSantander.id
   name         = "RefundBillingResponseModel"
@@ -84,7 +91,8 @@ resource "aws_api_gateway_integration" "mockSantanderRefundBillingIntegration" {
       }
     EOF
   }
-  type = "MOCK"
+  request_parameters = { "integration.request.header.refundId" = "'method.request.header.refundId'" }
+  type               = "MOCK"
 }
 
 resource "aws_api_gateway_integration_response" "mockSantanderRefundBillingIntegrationResponse200" {
@@ -122,11 +130,13 @@ resource "aws_api_gateway_method_response" "mockSantanderRefundBillingResponse20
 }
 
 resource "aws_api_gateway_method" "mockSantanderRefundBillingMethod" {
-  rest_api_id   = aws_api_gateway_rest_api.mockSantander.id
-  resource_id   = aws_api_gateway_resource.mockSantanderResourceDevolucao.id
-  http_method   = "PUT"
-  authorization = "NONE"
+  rest_api_id          = aws_api_gateway_rest_api.mockSantander.id
+  resource_id          = aws_api_gateway_resource.mockSantanderResourceDevolucao.id
+  http_method          = "PUT"
+  authorization        = "NONE"
+  request_validator_id = aws_api_gateway_request_validator.mockSantanderRefundBillingRequestValidator.id
   request_models = {
     "application/json" = aws_api_gateway_model.mockSantanderRefundBillingRequestModel.name
   }
+  request_parameters = { "method.request.querystring.refundId" = true }
 }
