@@ -46,6 +46,13 @@ resource "aws_api_gateway_model" "mockSantanderCreateBillingRequestModel" {
   EOF
 }
 
+resource "aws_api_gateway_request_validator" "mockSantanderCreateBillingRequestValidator" {
+  name                        = "CreateBillingRequestValidator"
+  rest_api_id                 = aws_api_gateway_rest_api.mockSantander.id
+  validate_request_body       = true
+  validate_request_parameters = true
+}
+
 resource "aws_api_gateway_model" "mockSantanderCreateBillingResponseModel" {
   rest_api_id  = aws_api_gateway_rest_api.mockSantander.id
   name         = "CreateBillingResponseModel"
@@ -119,6 +126,11 @@ resource "aws_api_gateway_method" "mockSantanderCreateBillingMethod" {
   request_models = {
     "application/json" = aws_api_gateway_model.mockSantanderCreateBillingRequestModel.name
   }
+  request_parameters = {
+    "method.request.path.txid"            = true,
+    "method.request.header.Authorization" = true
+  }
+  request_validator_id = aws_api_gateway_request_validator.mockSantanderCreateBillingRequestValidator.id
 }
 
 resource "aws_api_gateway_integration" "mockSantanderCreateBillingIntegration" {
@@ -128,14 +140,14 @@ resource "aws_api_gateway_integration" "mockSantanderCreateBillingIntegration" {
   request_templates = {
     "application/json" = <<EOF
       {
-        #if( $input.params('txid') == 123 )
-          "statusCode": 200,
-        #else
-          "statusCode": 500,
-        #end
+        "statusCode": 200,
         "body" : $util.escapeJavaScript($input.json('$'))
       }
     EOF
+  }
+  request_parameters = {
+    "integration.request.path.txid"            = "'method.request.path.txid'",
+    "integration.request.header.Authorization" = "'method.request.header.Authorization'"
   }
   type = "MOCK"
 }
