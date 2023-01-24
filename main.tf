@@ -10,6 +10,10 @@ variable "secret_key" {
   type = string
 }
 
+variable "deployment_stage" {
+  type = string
+}
+
 provider "aws" {
   region     = "us-east-1"
   access_key = var.access_key
@@ -35,5 +39,5 @@ resource "aws_api_gateway_deployment" "deployment" {
 resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.deployment.id
   rest_api_id   = aws_api_gateway_rest_api.mockSantander.id
-  stage_name    = "dev"
+  stage_name    = var.deployment_stage
 }
